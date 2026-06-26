@@ -69,7 +69,7 @@ export function Nav({ onOpenPalette }: NavProps) {
           <span className="w-8 h-8 rounded-lg bg-forsythia flex items-center justify-center">
             <LinkSolidIcon size={16} className="text-nocturnal-deep" aria-hidden="true" />
           </span>
-          <span className="font-mono font-700 text-lg text-arctic-powder tracking-tight">
+          <span className="font-mono font-bold text-lg text-text-primary tracking-tight">
             Next<span className="text-forsythia">Sync</span>
           </span>
         </a>
@@ -83,7 +83,7 @@ export function Nav({ onOpenPalette }: NavProps) {
                 className={`font-sans text-sm font-medium transition-colors duration-150 ${
                   activeSection === href
                     ? 'text-forsythia'
-                    : 'text-arctic-powder/70 hover:text-forsythia'
+                    : 'text-text-secondary hover:text-forsythia'
                 }`}
                 aria-current={activeSection === href ? 'page' : undefined}
               >
@@ -97,7 +97,8 @@ export function Nav({ onOpenPalette }: NavProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenPalette}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-150 font-sans text-xs text-white/50"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 font-sans text-xs text-text-muted"
+            style={{ border: '1px solid var(--border-color)', background: 'var(--bg-secondary)' }}
             aria-label="Open command palette"
             aria-keyshortcuts="Control+k Meta+k"
           >
@@ -115,7 +116,7 @@ export function Nav({ onOpenPalette }: NavProps) {
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden p-2 rounded-lg text-arctic-powder/70 hover:text-forsythia transition-colors duration-150"
+            className="md:hidden p-2 rounded-lg text-text-secondary hover:text-forsythia transition-colors duration-150"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
@@ -133,14 +134,14 @@ export function Nav({ onOpenPalette }: NavProps) {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="md:hidden nav-blur border-t border-white/10 px-6 py-4">
+        <div className="md:hidden nav-blur border-t border-[var(--border-color)] px-6 py-4">
           <ul className="flex flex-col gap-1" role="list">
             {links.map(({ href, label }) => (
               <li key={href}>
                 <a
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="block py-2 font-sans text-sm font-medium text-arctic-powder/80 hover:text-forsythia transition-colors duration-150"
+                  className="block py-2 font-sans text-sm font-medium text-text-primary hover:text-forsythia transition-colors duration-150"
                 >
                   {label}
                 </a>

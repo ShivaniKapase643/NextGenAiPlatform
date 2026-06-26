@@ -2,7 +2,102 @@
 
 import { useEffect, useRef } from 'react';
 import { ArrowPathIcon, ChevronRightIcon } from '@/lib/svgs';
-import { HeroCanvas } from './HeroCanvas';
+
+/* ─── Inline product dashboard mockup ────────────────────────────
+   Pure CSS animations — no library, no JS after mount.
+   Uses CSS vars so it adapts to both dark and light themes.
+   ─────────────────────────────────────────────────────────────── */
+const LOG_ENTRIES = [
+  { time: '14:32:01', msg: 'db.users → warehouse', lat: '1.2ms' },
+  { time: '14:32:01', msg: 'stripe.events webhook', lat: '0.8ms' },
+  { time: '14:32:02', msg: 'anomaly.detector run', lat: '4.1ms' },
+  { time: '14:32:02', msg: 'kafka.orders → analytics', lat: '1.9ms' },
+  { time: '14:32:03', msg: 'hubspot.contacts sync', lat: '2.3ms' },
+  { time: '14:32:03', msg: 'postgres → redshift', lat: '1.1ms' },
+  { time: '14:32:04', msg: 'snowflake.events pull', lat: '3.4ms' },
+  { time: '14:32:04', msg: 'ml.forecast pipeline', lat: '5.2ms' },
+];
+
+const PIPELINES = [
+  { name: 'Data Ingestion', pct: 94, color: '#FFC801' },
+  { name: 'ML Pipeline',    pct: 78, color: '#4ADE80' },
+  { name: 'API Gateway',    pct: 89, color: '#38BDF8' },
+];
+
+const METRICS = [
+  { val: '10B+',   label: 'Events/day', color: '#FFC801' },
+  { val: '<2ms',   label: 'Latency',    color: '#4ADE80' },
+  { val: '99.99%', label: 'Uptime',     color: '#38BDF8' },
+];
+
+function HeroDashboard() {
+  /* Double the entries so the seamless infinite scroll works */
+  const rows = [...LOG_ENTRIES, ...LOG_ENTRIES];
+
+  return (
+    <div className="hero-dashboard" role="img" aria-label="NextSync AI live dashboard preview">
+      {/* macOS-style window chrome */}
+      <div className="dash-chrome">
+        <div className="dash-dots">
+          <span className="dash-dot dash-dot-r" />
+          <span className="dash-dot dash-dot-y" />
+          <span className="dash-dot dash-dot-g" />
+        </div>
+        <span className="dash-win-title">NextSync · Live Dashboard</span>
+        <div className="dash-live">
+          <span className="live-pulse" aria-hidden="true" />
+          LIVE
+        </div>
+      </div>
+
+      {/* Metric strip */}
+      <div className="dash-metrics" aria-label="Key metrics">
+        {METRICS.map((m) => (
+          <div key={m.label} className="dash-metric">
+            <span className="dash-metric-val" style={{ color: m.color }}>{m.val}</span>
+            <span className="dash-metric-lbl">{m.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Data pipeline bars */}
+      <div className="dash-pipelines" aria-label="Pipeline status">
+        {PIPELINES.map((p, i) => (
+          <div key={p.name} className="dash-pipe-row">
+            <span className="dash-pipe-name">{p.name}</span>
+            <div className="dash-pipe-track" role="progressbar" aria-valuenow={p.pct} aria-valuemin={0} aria-valuemax={100}>
+              <div
+                className="dash-pipe-fill"
+                style={{ '--pipe-w': `${p.pct}%`, '--pipe-delay': `${i * 0.18}s`, background: p.color } as React.CSSProperties}
+              />
+            </div>
+            <span className="dash-pipe-pct" style={{ color: p.color }}>{p.pct}%</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Scrolling activity log */}
+      <div className="dash-log">
+        <div className="dash-log-hdr">
+          <span className="dash-log-title">Activity Stream</span>
+          <span className="dash-log-rate" aria-label="3400 events per second">↑ 3.4K/s</span>
+        </div>
+        <div className="dash-log-viewport" aria-hidden="true">
+          <div className="dash-log-scroll">
+            {rows.map((entry, i) => (
+              <div key={i} className="dash-log-row">
+                <span className="dash-log-time">{entry.time}</span>
+                <span className="dash-log-msg">{entry.msg}</span>
+                <span className="dash-log-lat">{entry.lat}</span>
+                <span className="dash-log-ok">✓</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function trackRender(section: string) {
   if (typeof window === 'undefined') return;
@@ -66,8 +161,8 @@ export function Hero() {
 
             <h1
               id="hero-heading"
-              className="font-mono font-bold text-arctic-powder leading-[1.05] mb-6 reveal"
-              style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
+              className="font-mono font-bold leading-[1.05] mb-6 reveal"
+              style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)', color: 'var(--arctic-powder)' }}
             >
               Automate Your{' '}
               <span className="gradient-text">Data Universe</span>{' '}
@@ -75,8 +170,8 @@ export function Hero() {
             </h1>
 
             <p
-              className="font-sans text-arctic-powder/70 max-w-xl leading-relaxed mb-10 reveal-delay-1"
-              style={{ fontSize: 'clamp(1rem, 1.8vw, 1.2rem)' }}
+              className="font-sans max-w-xl leading-relaxed mb-10 reveal-delay-1"
+              style={{ fontSize: 'clamp(1rem, 1.8vw, 1.2rem)', color: 'rgba(241,246,244,0.7)' }}
             >
               NextSync AI connects every data source, transforms streams on the fly,
               and delivers predictive insights — with zero infrastructure overhead
@@ -88,7 +183,11 @@ export function Hero() {
                 Start Free Trial
                 <ChevronRightIcon size={16} aria-hidden="true" />
               </a>
-              <a href="#features" className="btn-outline text-base">
+              <a
+                href="#features"
+                className="btn-outline text-base"
+                style={{ color: 'var(--arctic-powder)', borderColor: 'rgba(241,246,244,0.25)' }}
+              >
                 Explore Features
               </a>
             </div>
@@ -102,52 +201,27 @@ export function Hero() {
               ].map(({ val, label }) => (
                 <div key={label} className="flex items-baseline gap-1.5">
                   <span className="font-mono font-bold text-forsythia text-xl">{val}</span>
-                  <span className="font-sans text-sm text-arctic-powder/50">{label}</span>
+                  <span className="font-sans text-sm" style={{ color: 'rgba(241,246,244,0.5)' }}>{label}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Right: floating node constellation */}
-          <div
-            className="relative hidden lg:flex items-center justify-center"
-            style={{ height: '420px' }}
-            aria-hidden="true"
-          >
-            {/* Faint container glow */}
-            <div
-              className="absolute inset-0 rounded-3xl"
-              style={{ background: 'radial-gradient(ellipse at center, rgba(255,200,1,0.06) 0%, transparent 70%)' }}
-            />
-            <HeroCanvas />
-
-            {/* Floating stat chips over canvas */}
-            {[
-              { val: '10B+', label: 'Events/day', top: '12%', left: '8%' },
-              { val: '3,400+', label: 'Customers', top: '70%', right: '6%' },
-              { val: '200+', label: 'Connectors', bottom: '10%', left: '15%' },
-            ].map(({ val, label, ...pos }) => (
-              <div
-                key={label}
-                className="absolute flex flex-col items-center bg-nocturnal-dark/80 backdrop-blur-sm border border-forsythia/20 rounded-xl px-3 py-2"
-                style={pos}
-              >
-                <span className="font-mono font-bold text-forsythia text-lg leading-none">{val}</span>
-                <span className="font-sans text-[10px] text-arctic-powder/50 mt-0.5">{label}</span>
-              </div>
-            ))}
+          {/* Right: live product dashboard preview */}
+          <div className="hidden lg:flex items-center justify-center reveal-delay-1">
+            <HeroDashboard />
           </div>
         </div>
       </div>
 
       {/* Scroll indicator — positioned at section bottom, no overlap (A4) */}
       <div
-        className="scroll-indicator absolute bottom-6 left-1/2 flex flex-col items-center gap-2 text-arctic-powder/30 z-10"
-        style={{ transform: 'translateX(-50%)' }}
+        className="scroll-indicator absolute bottom-6 left-1/2 flex flex-col items-center gap-2 z-10"
+        style={{ transform: 'translateX(-50%)', color: 'rgba(241,246,244,0.3)' }}
         aria-hidden="true"
       >
         <span className="font-mono text-[10px] tracking-widest uppercase">Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-arctic-powder/30 to-transparent" />
+        <div className="w-px h-10" style={{ background: 'linear-gradient(to bottom, rgba(241,246,244,0.3), transparent)' }} />
       </div>
     </section>
   );
